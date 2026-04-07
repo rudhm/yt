@@ -1,0 +1,42 @@
+.home-page {
+  min-height: 100vh;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+.error-message {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  padding: 1rem 1.5rem;
+  background: #ff000020;
+  border: 1px solid #ff0000;
+  border-radius: 4px;
+  color: #ff6666;
+  text-align: center;
+}
+
+.search-info {
+  max-width: 1400px;
+  margin: 0 auto 1.5rem;
+  padding: 0 1rem;
+  color: #aaa;
+}
+
+.search-info p {
+  margin: 0.25rem 0;
+}
+
+.search-info strong {
+  color: #fff;
+}
+
+.filter-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #00ff0020;
+  border: 1px solid #00ff00;
+  border-radius: 4px;
+  color: #00ff00;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
