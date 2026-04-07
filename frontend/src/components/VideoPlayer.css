@@ -9,6 +9,7 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  transform: translateZ(0); /* Force GPU compositing to prevent banding */
 }
 
 .video-player-container {
@@ -19,6 +20,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   overflow: hidden;
+  isolation: isolate; /* Backup compositing fix */
   /* Removed any :hover states or background patterns from here */
 }
 
