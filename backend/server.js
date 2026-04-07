@@ -54,6 +54,11 @@ app.get('/', (req, res) => {
   });
 });
 
+// Keep-alive ping endpoint for external monitoring
+app.get('/ping', (req, res) => {
+  res.json({ status: 'alive' });
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
