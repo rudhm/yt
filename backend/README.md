@@ -6,6 +6,10 @@ Backend API server for the custom YouTube frontend. Filters out YouTube Shorts a
 
 - ✅ YouTube Data API v3 integration
 - ✅ Automatic Shorts filtering (excludes videos <4 minutes)
+- ✅ **Google OAuth 2.0 authentication**
+- ✅ **JWT-based user sessions**
+- ✅ **Subscriptions API (fetch user's YouTube subscriptions)**
+- ✅ **Subscription feed with Shorts filtering**
 - ✅ CORS enabled for frontend integration
 - ✅ Environment-based configuration
 - ✅ Error handling and logging
@@ -22,6 +26,11 @@ Backend API server for the custom YouTube frontend. Filters out YouTube Shorts a
    ```
    PORT=5000
    YOUTUBE_API_KEY=your_actual_api_key_here
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
+   JWT_SECRET=your_secure_random_secret
+   SESSION_SECRET=another_secure_random_secret
+   FRONTEND_URL=http://localhost:5173
    ```
 
 3. **Get a YouTube API Key:**
@@ -47,13 +56,37 @@ Server will start on `http://localhost:5000`
 
 ## API Endpoints
 
-### Health Check
-```
-GET /
-```
-Returns server status and timestamp.
+### Authentication
 
-### Search Videos (Medium Duration)
+#### Google OAuth Login
+```
+GET /api/auth/google
+```
+Initiates Google OAuth flow for user sign-in.
+
+#### OAuth Callback
+```
+GET /api/auth/google/callback
+```
+Handles Google OAuth callback (automatic).
+
+#### Get Current User
+```
+GET /api/auth/me
+Authorization: Bearer JWT_TOKEN
+```
+Returns authenticated user's information.
+
+#### Logout
+```
+POST /api/auth/logout
+Authorization: Bearer JWT_TOKEN
+```
+Clears OAuth tokens.
+
+### Search
+
+#### Search Videos (Medium Duration)
 ```
 GET /api/search?q=<query>&maxResults=<number>
 ```
@@ -68,11 +101,32 @@ Search for videos 4-20 minutes long (filters out Shorts).
 curl "http://localhost:5000/api/search?q=programming&maxResults=10"
 ```
 
-### Search Long Videos Only
+#### Search Long Videos Only
 ```
 GET /api/search/long?q=<query>&maxResults=<number>
 ```
 Search for videos >20 minutes only.
+
+### Subscriptions
+
+#### Get User Subscriptions
+```
+GET /api/subscriptions
+Authorization: Bearer JWT_TOKEN
+```
+Fetches user's subscribed YouTube channels.
+
+#### Get Subscription Feed
+```
+GET /api/subscriptions/feed?maxResults=<number>
+Authorization: Bearer JWT_TOKEN
+```
+Fetches latest videos from subscribed channels (Shorts filtered).
+
+**Parameters:**
+- `maxResults` (optional): Number of videos (default: 20)
+
+See [OAUTH_API_DOCS.md](./OAUTH_API_DOCS.md) for detailed authentication documentation.
 
 ## Shorts Filtering
 
@@ -86,13 +140,20 @@ Since Shorts are typically <60 seconds, filtering for videos ≥4 minutes effect
 
 ```
 backend/
-├── server.js           # Main Express app
+├── server.js              # Main Express app
 ├── routes/
-│   └── search.js       # Search API with Shorts filtering
-├── .env                # Environment variables (not committed)
-├── .gitignore          # Git ignore rules
-├── package.json        # Dependencies and scripts
-└── README.md           # This file
+│   ├── search.js          # Search API with Shorts filtering
+│   ├── auth.js            # Google OAuth & JWT authentication
+│   └── subscriptions.js   # Subscriptions and feed API
+├── middleware/
+│   └── auth.js            # JWT authentication middleware
+├── utils/
+│   └── jwt.js             # JWT token utilities
+├── .env                   # Environment variables (not committed)
+├── .gitignore             # Git ignore rules
+├── package.json           # Dependencies and scripts
+├── README.md              # This file
+└── OAUTH_API_DOCS.md      # OAuth API documentation
 ```
 
 ## Dependencies
@@ -101,13 +162,18 @@ backend/
 - **cors**: Enable cross-origin requests
 - **dotenv**: Environment variable management
 - **axios**: HTTP client for YouTube API calls
+- **passport**: Authentication middleware
+- **passport-google-oauth20**: Google OAuth 2.0 strategy
+- **jsonwebtoken**: JWT token generation and verification
+- **express-session**: Session management for OAuth flow
 - **nodemon**: Auto-restart during development (dev only)
 
 ## Next Steps
 
-- [ ] Add OAuth 2.0 for authenticated features (subscriptions, history)
-- [ ] Implement caching to reduce API quota usage
-- [ ] Add video details endpoint
+- [x] OAuth 2.0 authentication implemented
+- [x] Subscriptions API working
+- [ ] Frontend login UI
+- [ ] Subscription feed page
 - [ ] Deploy to Render or similar hosting service
 
 ## API Quota
