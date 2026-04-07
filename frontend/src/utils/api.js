@@ -7,6 +7,15 @@ const api = axios.create({
   timeout: 10000,
 });
 
+// Add auth token to all requests if available
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const searchVideos = async (query, maxResults = 20) => {
   try {
     const response = await api.get('/api/search', {
@@ -27,6 +36,28 @@ export const searchLongVideos = async (query, maxResults = 20) => {
     return response.data;
   } catch (error) {
     console.error('Long videos search error:', error);
+    throw error;
+  }
+};
+
+export const getSubscriptions = async () => {
+  try {
+    const response = await api.get('/api/subscriptions');
+    return response.data;
+  } catch (error) {
+    console.error('Get subscriptions error:', error);
+    throw error;
+  }
+};
+
+export const getSubscriptionFeed = async (maxResults = 20) => {
+  try {
+    const response = await api.get('/api/subscriptions/feed', {
+      params: { maxResults }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Get subscription feed error:', error);
     throw error;
   }
 };

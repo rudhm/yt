@@ -1,7 +1,10 @@
 .home-page {
   min-height: 100vh;
-  padding-top: 2rem;
   padding-bottom: 4rem;
+}
+
+.search-section {
+  padding-top: 2rem;
 }
 
 .error-message {

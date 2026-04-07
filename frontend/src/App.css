@@ -20,39 +20,6 @@ body {
   flex-direction: column;
 }
 
-.app-header {
-  background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
-  padding: 2rem 1rem;
-  border-bottom: 1px solid #333;
-}
-
-.header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.app-title {
-  margin: 0;
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.logo-icon {
-  color: #ff0000;
-  font-size: 2rem;
-}
-
-.app-subtitle {
-  margin: 0.5rem 0 0 0;
-  font-size: 1rem;
-  color: #aaa;
-  font-weight: 400;
-}
-
 .app-main {
   flex: 1;
 }
@@ -63,18 +30,4 @@ body {
   color: #666;
   font-size: 0.875rem;
   border-top: 1px solid #222;
-}
-
-@media (max-width: 768px) {
-  .app-title {
-    font-size: 2rem;
-  }
-  
-  .logo-icon {
-    font-size: 1.75rem;
-  }
-  
-  .app-subtitle {
-    font-size: 0.875rem;
-  }
 }
