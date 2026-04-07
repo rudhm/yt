@@ -10,7 +10,7 @@ function Header() {
         <div className="header-left">
           <h1 className="app-title">
             <span className="logo-icon">▶</span>
-            My YouTube
+            lapop
           </h1>
           <p className="app-subtitle">No Shorts. No Distractions. Just Videos.</p>
         </div>
