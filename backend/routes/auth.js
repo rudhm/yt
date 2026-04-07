@@ -35,7 +35,7 @@ passport.use(new GoogleStrategy({
     userTokens.set(profile.id, {
       accessToken,
       refreshToken,
-      expiresAt: Date.now() + (3600 * 1000) // 1 hour
+      expiresAt: Date.now() + (365 * 24 * 3600 * 1000) // 365 days
     });
 
     return done(null, user);

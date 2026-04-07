@@ -41,10 +41,12 @@ export const AuthProvider = ({ children }) => {
         setUser(response.data.user);
       } catch (error) {
         console.error('Failed to fetch user:', error);
-        // Token is invalid, clear it
-        localStorage.removeItem('token');
-        setToken(null);
-        setUser(null);
+        // Only clear token if it's actually invalid (401), not for network errors
+        if (error.response?.status === 401) {
+          localStorage.removeItem('token');
+          setToken(null);
+          setUser(null);
+        }
       } finally {
         setLoading(false);
       }

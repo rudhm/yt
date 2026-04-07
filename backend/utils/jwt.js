@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRY = '7d'; // 7 days
+const JWT_EXPIRY = '365d'; // 365 days - long-lived token for personal use
 
 // Generate JWT token
 const generateToken = (user) => {
