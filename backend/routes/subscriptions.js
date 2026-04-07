@@ -62,7 +62,7 @@ router.get('/', authenticateToken, async (req, res) => {
 // Get subscription feed (latest videos from subscribed channels)
 router.get('/feed', authenticateToken, async (req, res) => {
   try {
-    const { maxResults = 20 } = req.query;
+    const { maxResults = 20, pageToken } = req.query;
     const userId = req.user.id;
     const oauthToken = getUserOAuthToken(userId);
 

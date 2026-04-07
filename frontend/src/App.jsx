@@ -14,7 +14,7 @@ function App() {
         </main>
 
         <footer className="app-footer">
-          <p>Powered by YouTube Data API v3 • Built with React</p>
+          <p>Made by <span className="creator-name">Anirudh</span></p>
         </footer>
       </div>
     </AuthProvider>

@@ -4,7 +4,7 @@ const axios = require('axios');
 
 router.get('/', async (req, res) => {
   try {
-    const { q, maxResults = 20 } = req.query;
+    const { q, maxResults = 20, pageToken } = req.query;
     
     if (!q) {
       return res.status(400).json({ error: 'Search query (q) is required' });
@@ -22,18 +22,25 @@ router.get('/', async (req, res) => {
     // Using videoDuration=medium to filter out most Shorts
     // Medium: 4-20 minutes, Long: >20 minutes
     // This excludes anything under 4 minutes which covers essentially all Shorts
+    const params = {
+      part: 'snippet',
+      q: q,
+      type: 'video',
+      videoDuration: 'medium', // Filters out Shorts (<4 min)
+      maxResults: parseInt(maxResults),
+      key: API_KEY
+    };
+
+    // Add pageToken if provided for pagination
+    if (pageToken) {
+      params.pageToken = pageToken;
+    }
+
     const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
-      params: {
-        part: 'snippet',
-        q: q,
-        type: 'video',
-        videoDuration: 'medium', // Filters out Shorts (<4 min)
-        maxResults: parseInt(maxResults),
-        key: API_KEY
-      }
+      params
     });
 
-    console.log(`✓ Search successful: "${q}" - ${response.data.items?.length || 0} results`);
+    console.log(`✓ Search successful: "${q}" - ${response.data.items?.length || 0} results ${pageToken ? '(page ' + pageToken + ')' : ''}`);
 
     res.json({
       query: q,
@@ -41,7 +48,8 @@ router.get('/', async (req, res) => {
       resultsReturned: response.data.items?.length || 0,
       items: response.data.items || [],
       pageInfo: response.data.pageInfo,
-      nextPageToken: response.data.nextPageToken
+      nextPageToken: response.data.nextPageToken,
+      prevPageToken: response.data.prevPageToken
     });
 
   } catch (error) {

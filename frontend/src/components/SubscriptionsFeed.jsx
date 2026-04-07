@@ -7,6 +7,8 @@ function SubscriptionsFeed({ onVideoClick }) {
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [nextPageToken, setNextPageToken] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
     const fetchFeed = async () => {
@@ -16,6 +18,7 @@ function SubscriptionsFeed({ onVideoClick }) {
       try {
         const data = await getSubscriptionFeed(20);
         setVideos(data.items || []);
+        setNextPageToken(data.nextPageToken || null);
         
         if (data.items?.length === 0) {
           setError('No recent videos from your subscriptions. Try searching instead!');
@@ -36,6 +39,21 @@ function SubscriptionsFeed({ onVideoClick }) {
 
     fetchFeed();
   }, []);
+
+  const handleLoadMore = async () => {
+    if (!nextPageToken || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      const data = await getSubscriptionFeed(20, nextPageToken);
+      setVideos(prev => [...prev, ...(data.items || [])]);
+      setNextPageToken(data.nextPageToken || null);
+    } catch (err) {
+      console.error('Load more failed:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   if (error) {
     return (
@@ -70,6 +88,18 @@ function SubscriptionsFeed({ onVideoClick }) {
         onVideoClick={onVideoClick}
         isLoading={isLoading}
       />
+
+      {!isLoading && videos.length > 0 && nextPageToken && (
+        <div className="load-more-container">
+          <button 
+            className="load-more-button"
+            onClick={handleLoadMore}
+            disabled={isLoadingMore}
+          >
+            {isLoadingMore ? 'Loading...' : 'Load More'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

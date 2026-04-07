@@ -15,16 +15,20 @@ function Home() {
   const [error, setError] = useState(null);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [nextPageToken, setNextPageToken] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { isAuthenticated } = useAuth();
 
   const handleSearch = async (query) => {
     setIsLoading(true);
     setError(null);
     setSearchQuery(query);
+    setNextPageToken(null);
 
     try {
       const data = await searchVideos(query);
       setVideos(data.items || []);
+      setNextPageToken(data.nextPageToken || null);
       
       if (data.items?.length === 0) {
         setError('No videos found. Try a different search.');
@@ -38,6 +42,22 @@ function Home() {
       setVideos([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (!nextPageToken || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      const data = await searchVideos(searchQuery, 20, nextPageToken);
+      setVideos(prev => [...prev, ...(data.items || [])]);
+      setNextPageToken(data.nextPageToken || null);
+    } catch (err) {
+      console.error('Load more failed:', err);
+      setError('Failed to load more videos.');
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -88,6 +108,18 @@ function Home() {
             onVideoClick={handleVideoClick}
             isLoading={isLoading}
           />
+          
+          {!isLoading && videos.length > 0 && nextPageToken && (
+            <div className="load-more-container">
+              <button 
+                className="load-more-button"
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
+              >
+                {isLoadingMore ? 'Loading...' : 'Load More'}
+              </button>
+            </div>
+          )}
         </>
       ) : (
         <SubscriptionsFeed onVideoClick={handleVideoClick} />

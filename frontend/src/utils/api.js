@@ -16,11 +16,14 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const searchVideos = async (query, maxResults = 20) => {
+export const searchVideos = async (query, maxResults = 20, pageToken = null) => {
   try {
-    const response = await api.get('/api/search', {
-      params: { q: query, maxResults }
-    });
+    const params = { q: query, maxResults };
+    if (pageToken) {
+      params.pageToken = pageToken;
+    }
+    
+    const response = await api.get('/api/search', { params });
     return response.data;
   } catch (error) {
     console.error('Search error:', error);
@@ -50,11 +53,14 @@ export const getSubscriptions = async () => {
   }
 };
 
-export const getSubscriptionFeed = async (maxResults = 20) => {
+export const getSubscriptionFeed = async (maxResults = 20, pageToken = null) => {
   try {
-    const response = await api.get('/api/subscriptions/feed', {
-      params: { maxResults }
-    });
+    const params = { maxResults };
+    if (pageToken) {
+      params.pageToken = pageToken;
+    }
+    
+    const response = await api.get('/api/subscriptions/feed', { params });
     return response.data;
   } catch (error) {
     console.error('Get subscription feed error:', error);

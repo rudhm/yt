@@ -31,3 +31,43 @@ body {
   font-size: 0.875rem;
   border-top: 1px solid #222;
 }
+
+.app-footer .creator-name {
+  font-weight: 700;
+  font-size: 1.1em;
+  background: linear-gradient(
+    90deg,
+    #ff6b6b,
+    #ffd93d,
+    #6bcf7f,
+    #4d96ff,
+    #c96bff,
+    #ff6b6b
+  );
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 6s ease infinite, glowPulse 3s ease-in-out infinite;
+  display: inline-block;
+  position: relative;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(255, 107, 107, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(201, 107, 255, 0.8)) 
+            drop-shadow(0 0 12px rgba(77, 150, 255, 0.6));
+  }
+}
