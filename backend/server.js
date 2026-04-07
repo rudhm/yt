@@ -7,6 +7,9 @@ const passport = require('passport');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for Render deployment (fixes OAuth HTTPS redirect_uri)
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
