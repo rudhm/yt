@@ -73,10 +73,12 @@ router.get('/feed', authenticateToken, async (req, res) => {
       });
     }
 
-    // First, get user's subscribed channels
+    console.log('🔄 Fetching subscription feed...');
+
+    // Step 1: Get user's subscribed channels with contentDetails
     const subsResponse = await axios.get('https://www.googleapis.com/youtube/v3/subscriptions', {
       params: {
-        part: 'snippet',
+        part: 'snippet,contentDetails',
         mine: true,
         maxResults: 50
       },
@@ -85,11 +87,10 @@ router.get('/feed', authenticateToken, async (req, res) => {
       }
     });
 
-    const channelIds = subsResponse.data.items.map(
-      item => item.snippet.resourceId.channelId
-    );
+    const subscriptions = subsResponse.data.items;
+    console.log(`✓ Found ${subscriptions.length} subscribed channels`);
 
-    if (channelIds.length === 0) {
+    if (subscriptions.length === 0) {
       return res.json({
         items: [],
         totalResults: 0,
@@ -97,44 +98,83 @@ router.get('/feed', authenticateToken, async (req, res) => {
       });
     }
 
-    // Fetch latest videos from these channels
-    // Use Activities API to get recent uploads
-    const response = await axios.get('https://www.googleapis.com/youtube/v3/activities', {
+    // Step 2: Get channel details to find their uploads playlist IDs
+    const channelIds = subscriptions.map(sub => sub.snippet.resourceId.channelId);
+    const channelsResponse = await axios.get('https://www.googleapis.com/youtube/v3/channels', {
       params: {
-        part: 'snippet,contentDetails',
-        mine: true,
-        maxResults: parseInt(maxResults),
-        publishedAfter: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() // Last 7 days
-      },
-      headers: {
-        'Authorization': `Bearer ${oauthToken}`
+        part: 'contentDetails',
+        id: channelIds.slice(0, 50).join(','), // Max 50 IDs per request
+        key: process.env.YOUTUBE_API_KEY
       }
     });
 
-    // Filter for video uploads and apply Shorts filter
-    const videos = [];
-    
-    for (const item of response.data.items) {
-      if (item.snippet.type === 'upload' && item.contentDetails?.upload?.videoId) {
-        const videoId = item.contentDetails.upload.videoId;
-        
-        // Fetch video details to check duration
-        const videoDetails = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+    const uploadsPlaylistIds = channelsResponse.data.items.map(
+      channel => channel.contentDetails.relatedPlaylists.uploads
+    );
+
+    console.log(`✓ Retrieved ${uploadsPlaylistIds.length} uploads playlist IDs`);
+
+    // Step 3: Fetch recent videos from each uploads playlist
+    const allVideoIds = [];
+    const publishedAfter = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(); // Last 30 days
+
+    for (const playlistId of uploadsPlaylistIds) {
+      try {
+        const playlistResponse = await axios.get('https://www.googleapis.com/youtube/v3/playlistItems', {
           params: {
             part: 'snippet,contentDetails',
-            id: videoId,
+            playlistId: playlistId,
+            maxResults: 10, // Get ~10 recent videos per channel
             key: process.env.YOUTUBE_API_KEY
           }
         });
 
-        if (videoDetails.data.items.length > 0) {
-          const video = videoDetails.data.items[0];
-          const duration = video.contentDetails.duration;
+        // Filter by date and collect video IDs
+        for (const item of playlistResponse.data.items || []) {
+          const publishedAt = new Date(item.snippet.publishedAt);
+          const cutoffDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
           
-          // Parse ISO 8601 duration and filter Shorts (<60 seconds)
+          if (publishedAt >= cutoffDate && item.contentDetails?.videoId) {
+            allVideoIds.push(item.contentDetails.videoId);
+          }
+        }
+      } catch (err) {
+        console.error(`⚠️  Error fetching playlist ${playlistId}:`, err.message);
+      }
+    }
+
+    console.log(`✓ Collected ${allVideoIds.length} videos from the last 30 days (before filtering)`);
+
+    if (allVideoIds.length === 0) {
+      return res.json({
+        items: [],
+        totalResults: 0,
+        message: 'No recent videos found in the last 30 days'
+      });
+    }
+
+    // Step 4: Fetch video details in batches (50 per request) to check duration
+    const videos = [];
+    const batchSize = 50;
+    
+    for (let i = 0; i < allVideoIds.length; i += batchSize) {
+      const batch = allVideoIds.slice(i, i + batchSize);
+      
+      try {
+        const videoDetails = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+          params: {
+            part: 'snippet,contentDetails',
+            id: batch.join(','),
+            key: process.env.YOUTUBE_API_KEY
+          }
+        });
+
+        // Filter out Shorts (keep videos >= 4 minutes)
+        for (const video of videoDetails.data.items || []) {
+          const duration = video.contentDetails.duration;
           const seconds = parseDuration(duration);
           
-          if (seconds >= 240) { // 4 minutes minimum (filters Shorts)
+          if (seconds >= 240) { // Keep videos 4 minutes or longer
             videos.push({
               kind: 'youtube#searchResult',
               id: { videoId: video.id },
@@ -142,19 +182,29 @@ router.get('/feed', authenticateToken, async (req, res) => {
             });
           }
         }
+      } catch (err) {
+        console.error(`⚠️  Error fetching video details for batch:`, err.message);
       }
     }
 
-    console.log(`✓ Subscription feed: ${videos.length} videos (Shorts filtered)`);
+    console.log(`✓ After Shorts filter: ${videos.length} videos (removed ${allVideoIds.length - videos.length} shorts)`);
+
+    // Step 5: Sort by published date (newest first) and limit results
+    videos.sort((a, b) => 
+      new Date(b.snippet.publishedAt) - new Date(a.snippet.publishedAt)
+    );
+
+    const limitedVideos = videos.slice(0, parseInt(maxResults));
+    console.log(`✓ Returning ${limitedVideos.length} videos to frontend`);
 
     res.json({
-      items: videos,
-      totalResults: videos.length,
-      filtered: 'Shorts removed (duration < 4 minutes)'
+      items: limitedVideos,
+      totalResults: limitedVideos.length,
+      filtered: `Shorts removed (duration < 4 minutes). Showing latest from 30 days.`
     });
 
   } catch (error) {
-    console.error('Error fetching subscription feed:', error.response?.data || error.message);
+    console.error('❌ Error fetching subscription feed:', error.response?.data || error.message);
     
     if (error.response?.status === 401) {
       return res.status(401).json({ 
