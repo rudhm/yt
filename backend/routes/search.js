@@ -28,7 +28,8 @@ router.get('/', async (req, res) => {
       type: 'video',
       videoDuration: 'medium', // Filters out Shorts (<4 min)
       maxResults: parseInt(maxResults),
-      key: API_KEY
+      key: API_KEY,
+      fields: 'items(id(videoId),snippet(title,thumbnails,publishedAt,channelTitle)),pageInfo,nextPageToken,prevPageToken'
     };
 
     // Add pageToken if provided for pagination
@@ -89,7 +90,8 @@ router.get('/long', async (req, res) => {
         type: 'video',
         videoDuration: 'long', // Only videos >20 minutes
         maxResults: parseInt(maxResults),
-        key: API_KEY
+        key: API_KEY,
+        fields: 'items(id(videoId),snippet(title,thumbnails,publishedAt,channelTitle)),pageInfo,nextPageToken'
       }
     });
 

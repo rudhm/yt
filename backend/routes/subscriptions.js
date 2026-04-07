@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const NodeCache = require('node-cache');
 const { authenticateToken } = require('../middleware/auth');
 const { getUserOAuthToken } = require('./auth');
+
+// In-memory cache: 15 minutes TTL (900 seconds)
+const feedCache = new NodeCache({ stdTTL: 900, checkperiod: 120 });
 
 // Get user's subscriptions
 router.get('/', authenticateToken, async (req, res) => {
@@ -17,13 +21,14 @@ router.get('/', authenticateToken, async (req, res) => {
       });
     }
 
-    // Fetch subscriptions from YouTube API
+    // Fetch subscriptions from YouTube API (with field filtering)
     const response = await axios.get('https://www.googleapis.com/youtube/v3/subscriptions', {
       params: {
         part: 'snippet',
         mine: true,
         maxResults: 50,
-        order: 'alphabetical'
+        order: 'alphabetical',
+        fields: 'items(id,snippet(title,description,resourceId(channelId),thumbnails(default))),pageInfo'
       },
       headers: {
         'Authorization': `Bearer ${oauthToken}`
@@ -73,14 +78,24 @@ router.get('/feed', authenticateToken, async (req, res) => {
       });
     }
 
-    console.log('🔄 Fetching subscription feed...');
+    // Check cache first (per user)
+    const cacheKey = `feed_${userId}`;
+    const cachedFeed = feedCache.get(cacheKey);
+    
+    if (cachedFeed) {
+      console.log(`✓ Returning cached feed for user ${userId} (${cachedFeed.items.length} videos)`);
+      return res.json(cachedFeed);
+    }
 
-    // Step 1: Get user's subscribed channels with contentDetails
+    console.log('🔄 Fetching fresh subscription feed...');
+
+    // Step 1: Get user's subscribed channels (with field filtering)
     const subsResponse = await axios.get('https://www.googleapis.com/youtube/v3/subscriptions', {
       params: {
-        part: 'snippet,contentDetails',
+        part: 'snippet',
         mine: true,
-        maxResults: 50
+        maxResults: 50,
+        fields: 'items(snippet(resourceId(channelId)))'
       },
       headers: {
         'Authorization': `Bearer ${oauthToken}`
@@ -98,13 +113,14 @@ router.get('/feed', authenticateToken, async (req, res) => {
       });
     }
 
-    // Step 2: Get channel details to find their uploads playlist IDs
+    // Step 2: Get channel details to find their uploads playlist IDs (with field filtering)
     const channelIds = subscriptions.map(sub => sub.snippet.resourceId.channelId);
     const channelsResponse = await axios.get('https://www.googleapis.com/youtube/v3/channels', {
       params: {
         part: 'contentDetails',
-        id: channelIds.slice(0, 50).join(','), // Max 50 IDs per request
-        key: process.env.YOUTUBE_API_KEY
+        id: channelIds.slice(0, 50).join(','),
+        key: process.env.YOUTUBE_API_KEY,
+        fields: 'items(contentDetails(relatedPlaylists(uploads)))'
       }
     });
 
@@ -114,76 +130,88 @@ router.get('/feed', authenticateToken, async (req, res) => {
 
     console.log(`✓ Retrieved ${uploadsPlaylistIds.length} uploads playlist IDs`);
 
-    // Step 3: Fetch recent videos from each uploads playlist
+    // Step 3: Fetch recent videos from ALL playlists in PARALLEL (Promise.all)
     const allVideoIds = [];
-    const publishedAfter = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(); // Last 30 days
-
-    for (const playlistId of uploadsPlaylistIds) {
-      try {
-        const playlistResponse = await axios.get('https://www.googleapis.com/youtube/v3/playlistItems', {
-          params: {
-            part: 'snippet,contentDetails',
-            playlistId: playlistId,
-            maxResults: 10, // Get ~10 recent videos per channel
-            key: process.env.YOUTUBE_API_KEY
-          }
-        });
-
-        // Filter by date and collect video IDs
-        for (const item of playlistResponse.data.items || []) {
-          const publishedAt = new Date(item.snippet.publishedAt);
-          const cutoffDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-          
-          if (publishedAt >= cutoffDate && item.contentDetails?.videoId) {
-            allVideoIds.push(item.contentDetails.videoId);
-          }
+    
+    const playlistPromises = uploadsPlaylistIds.map(playlistId => 
+      axios.get('https://www.googleapis.com/youtube/v3/playlistItems', {
+        params: {
+          part: 'contentDetails',
+          playlistId: playlistId,
+          maxResults: 10,
+          key: process.env.YOUTUBE_API_KEY,
+          fields: 'items(contentDetails(videoId,videoPublishedAt))'
         }
-      } catch (err) {
+      }).catch(err => {
         console.error(`⚠️  Error fetching playlist ${playlistId}:`, err.message);
+        return { data: { items: [] } };
+      })
+    );
+
+    const playlistResults = await Promise.all(playlistPromises);
+    const cutoffDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    // Collect video IDs from all playlist results
+    for (const response of playlistResults) {
+      for (const item of response.data.items || []) {
+        const publishedAt = new Date(item.contentDetails?.videoPublishedAt);
+        
+        if (publishedAt >= cutoffDate && item.contentDetails?.videoId) {
+          allVideoIds.push(item.contentDetails.videoId);
+        }
       }
     }
 
     console.log(`✓ Collected ${allVideoIds.length} videos from the last 30 days (before filtering)`);
 
     if (allVideoIds.length === 0) {
-      return res.json({
+      const emptyResult = {
         items: [],
         totalResults: 0,
         message: 'No recent videos found in the last 30 days'
-      });
+      };
+      feedCache.set(cacheKey, emptyResult);
+      return res.json(emptyResult);
     }
 
-    // Step 4: Fetch video details in batches (50 per request) to check duration
+    // Step 4: Fetch video details in PARALLEL batches (with field filtering)
     const videos = [];
     const batchSize = 50;
+    const batchPromises = [];
     
     for (let i = 0; i < allVideoIds.length; i += batchSize) {
       const batch = allVideoIds.slice(i, i + batchSize);
       
-      try {
-        const videoDetails = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+      batchPromises.push(
+        axios.get('https://www.googleapis.com/youtube/v3/videos', {
           params: {
             part: 'snippet,contentDetails',
             id: batch.join(','),
-            key: process.env.YOUTUBE_API_KEY
+            key: process.env.YOUTUBE_API_KEY,
+            fields: 'items(id,snippet(title,thumbnails,publishedAt,channelTitle),contentDetails(duration))'
           }
-        });
+        }).catch(err => {
+          console.error(`⚠️  Error fetching video batch:`, err.message);
+          return { data: { items: [] } };
+        })
+      );
+    }
 
-        // Filter out Shorts (keep videos >= 4 minutes)
-        for (const video of videoDetails.data.items || []) {
-          const duration = video.contentDetails.duration;
-          const seconds = parseDuration(duration);
-          
-          if (seconds >= 240) { // Keep videos 4 minutes or longer
-            videos.push({
-              kind: 'youtube#searchResult',
-              id: { videoId: video.id },
-              snippet: video.snippet
-            });
-          }
+    const batchResults = await Promise.all(batchPromises);
+
+    // Filter out Shorts (keep videos >= 4 minutes)
+    for (const response of batchResults) {
+      for (const video of response.data.items || []) {
+        const duration = video.contentDetails.duration;
+        const seconds = parseDuration(duration);
+        
+        if (seconds >= 240) {
+          videos.push({
+            kind: 'youtube#searchResult',
+            id: { videoId: video.id },
+            snippet: video.snippet
+          });
         }
-      } catch (err) {
-        console.error(`⚠️  Error fetching video details for batch:`, err.message);
       }
     }
 
@@ -197,11 +225,17 @@ router.get('/feed', authenticateToken, async (req, res) => {
     const limitedVideos = videos.slice(0, parseInt(maxResults));
     console.log(`✓ Returning ${limitedVideos.length} videos to frontend`);
 
-    res.json({
+    const result = {
       items: limitedVideos,
       totalResults: limitedVideos.length,
-      filtered: `Shorts removed (duration < 4 minutes). Showing latest from 30 days.`
-    });
+      filtered: `Shorts removed (duration < 4 minutes). Showing latest from 30 days.`,
+      cached: false
+    };
+
+    // Cache the result for 15 minutes
+    feedCache.set(cacheKey, result);
+
+    res.json(result);
 
   } catch (error) {
     console.error('❌ Error fetching subscription feed:', error.response?.data || error.message);
