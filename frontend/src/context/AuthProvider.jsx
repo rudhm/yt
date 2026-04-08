@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { AuthContext } from './AuthContext';
+import api from '../utils/api';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -32,16 +32,12 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const response = await axios.get(`${API_URL}/api/auth/me`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        const response = await api.get('/api/auth/me');
         setUser(response.data.user);
       } catch (error) {
         console.error('Failed to fetch user:', error);
-        // Only clear token if it's actually invalid (401), not for network errors
-        if (error.response?.status === 401) {
+        // Clear stale/invalid tokens so the app can recover after secret changes or token expiry
+        if (error.response?.status === 401 || error.response?.status === 403) {
           localStorage.removeItem('token');
           setToken(null);
           setUser(null);
@@ -52,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     fetchUser();
-  }, [token, API_URL]);
+  }, [token]);
 
   const login = () => {
     window.location.href = `${API_URL}/api/auth/google`;
@@ -61,11 +57,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (token) {
-        await axios.post(`${API_URL}/api/auth/logout`, {}, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        await api.post('/api/auth/logout');
       }
     } catch (error) {
       console.error('Logout error:', error);

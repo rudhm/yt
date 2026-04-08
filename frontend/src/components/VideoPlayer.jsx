@@ -16,6 +16,7 @@ function VideoPlayer({ videoId, onClose }) {
   }, [onClose]);
 
   if (!videoId) return null;
+  const pipedInstance = (import.meta.env.VITE_PIPED_INSTANCE || 'https://piped.mha.fi').replace(/\/$/, '');
 
   return (
     <div className="video-player-overlay" onClick={onClose}>
@@ -27,7 +28,7 @@ function VideoPlayer({ videoId, onClose }) {
             className="video-iframe"
             width="560"
             height="315"
-            src={`https://piped.video/embed/${videoId}`}
+            src={`${pipedInstance}/embed/${videoId}`}
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

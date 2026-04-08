@@ -5,6 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://yt-lapop.onrender.com';
 const api = axios.create({
   baseURL: API_URL,
   timeout: 60000, // 60 seconds - handle Render cold starts and multiple API aggregations
+  withCredentials: true
 });
 
 // Add auth token to all requests if available
