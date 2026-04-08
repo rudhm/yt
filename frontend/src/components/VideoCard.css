@@ -1,14 +1,24 @@
 .video-card {
-  background: #1a1a1a;
-  border-radius: 8px;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line-color);
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, transform 0.2s, background-color 0.2s;
 }
 
 .video-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+  transform: translateY(-2px);
+  border-color: #3f5474;
+  background: #171f2d;
+}
+
+.video-card:focus-visible {
+  outline: 2px solid #5f81b8;
+  outline-offset: 2px;
 }
 
 .thumbnail-container {
@@ -28,30 +38,37 @@
 }
 
 .video-info {
-  padding: 1rem;
+  padding: 0.9rem;
 }
 
 .video-title {
-  font-size: 1rem;
+  font-size: 0.97rem;
   font-weight: 600;
-  margin: 0 0 0.5rem 0;
-  color: #fff;
-  line-height: 1.4;
+  margin: 0 0 0.4rem 0;
+  color: var(--text);
+  line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.channel-name {
-  font-size: 0.875rem;
-  color: #aaa;
-  margin: 0 0 0.5rem 0;
+.video-meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0 0 0.45rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
 }
 
 .video-description {
-  font-size: 0.875rem;
-  color: #888;
+  font-size: 0.83rem;
+  color: #9ba6b6;
   margin: 0;
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

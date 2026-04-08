@@ -1,63 +1,64 @@
 .tab-navigation {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 1rem 0;
+  padding: 0.8rem 1rem 0.45rem;
   display: flex;
   gap: 0.5rem;
-  border-bottom: 2px solid #333;
+  border-bottom: 1px solid var(--line-color);
 }
 
 .tab-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 0.95rem;
   background: transparent;
-  color: #aaa;
-  border: none;
-  border-bottom: 3px solid transparent;
-  font-size: 1rem;
+  color: var(--muted);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: -2px;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 }
 
 .tab-button:hover:not(.disabled) {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  background: var(--surface);
+  border-color: #374a67;
 }
 
 .tab-button.active {
-  color: #fff;
-  border-bottom-color: #ff0000;
+  color: var(--text);
+  background: var(--surface-elevated);
+  border-color: #4b638a;
 }
 
 .tab-button.disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .tab-icon {
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 
 .lock-icon {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   margin-left: 0.25rem;
 }
 
 @media (max-width: 768px) {
   .tab-navigation {
-    padding: 0.75rem 0.5rem 0;
+    padding: 0.75rem 0.5rem 0.45rem;
   }
 
   .tab-button {
-    padding: 0.625rem 1rem;
-    font-size: 0.9375rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.88rem;
   }
 
   .tab-icon {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 }

@@ -1,72 +1,76 @@
 .home-page {
-  min-height: 100vh;
-  padding-bottom: 4rem;
+  min-height: 100%;
+  padding-bottom: 2.5rem;
 }
 
 .search-section {
-  padding-top: 2rem;
+  padding-top: 1.2rem;
 }
 
 .error-message {
-  max-width: 800px;
-  margin: 0 auto 2rem;
-  padding: 1rem 1.5rem;
-  background: #ff000020;
-  border: 1px solid #ff0000;
-  border-radius: 4px;
-  color: #ff6666;
+  max-width: 980px;
+  margin: 0 auto 1.2rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 93, 93, 0.42);
+  background: rgba(255, 93, 93, 0.12);
+  color: #ff9f9f;
   text-align: center;
 }
 
 .search-info {
-  max-width: 1400px;
-  margin: 0 auto 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto 1rem;
   padding: 0 1rem;
-  color: #aaa;
+  color: var(--muted);
 }
 
 .search-info p {
-  margin: 0.25rem 0;
+  margin: 0.35rem 0;
 }
 
 .search-info strong {
-  color: #fff;
+  color: var(--text);
+}
+
+.results-count {
+  color: #b8cae2;
 }
 
 .filter-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background: #00ff0020;
-  border: 1px solid #00ff00;
-  border-radius: 4px;
-  color: #00ff00;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid #2f6048;
+  border-radius: 999px;
+  background: rgba(65, 158, 108, 0.15);
+  color: #90e3bc;
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
 }
 
 .load-more-container {
   display: flex;
   justify-content: center;
-  padding: 3rem 0;
-  margin-top: 2rem;
+  padding: 2.2rem 0 1rem;
 }
 
 .load-more-button {
-  padding: 1rem 3rem;
-  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: white;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 8px;
+  color: var(--text);
+  background: var(--surface-elevated);
+  border: 1px solid #445b7c;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
 }
 
 .load-more-button:hover:not(:disabled) {
+  background: #1f2b3e;
+  border-color: #56739f;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .load-more-button:disabled {

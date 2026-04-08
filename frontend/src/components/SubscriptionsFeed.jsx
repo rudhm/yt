@@ -59,7 +59,7 @@ function SubscriptionsFeed({ onVideoClick }) {
     return (
       <div className="subscriptions-feed">
         <div className="feed-header">
-          <h2>📺 Subscription Feed</h2>
+          <h2>Subscription feed</h2>
           <p className="feed-subtitle">Latest videos from channels you follow (Shorts filtered)</p>
         </div>
         <div className="error-message">
@@ -72,7 +72,7 @@ function SubscriptionsFeed({ onVideoClick }) {
   return (
     <div className="subscriptions-feed">
       <div className="feed-header">
-        <h2>📺 Subscription Feed</h2>
+        <h2>Subscription feed</h2>
         <p className="feed-subtitle">
           Latest videos from channels you follow (Shorts filtered)
         </p>

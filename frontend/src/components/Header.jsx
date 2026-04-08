@@ -1,4 +1,5 @@
 import { useAuth } from '../hooks/useAuth';
+import AnimatedLogo from './AnimatedLogo';
 import './Header.css';
 
 function Header() {
@@ -7,12 +8,12 @@ function Header() {
   return (
     <header className="app-header">
       <div className="header-content">
-        <div className="header-left">
-          <h1 className="app-title">
-            <span className="logo-icon">▶</span>
-            lapop
-          </h1>
-          <p className="app-subtitle">No Shorts. No Distractions. Just Videos.</p>
+        <div className="brand-block">
+          <AnimatedLogo />
+          <div className="brand-text">
+            <h1 className="app-title">lapop</h1>
+            <p className="app-subtitle">Search-focused YouTube. Shorts filtered.</p>
+          </div>
         </div>
 
         <div className="header-right">

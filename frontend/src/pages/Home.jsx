@@ -96,7 +96,12 @@ function Home() {
 
           {searchQuery && !error && (
             <div className="search-info">
-              <p>Search results for: <strong>{searchQuery}</strong></p>
+              <p>
+                Search results for <strong>{searchQuery}</strong>
+                {videos.length > 0 && (
+                  <span className="results-count"> • {videos.length} videos</span>
+                )}
+              </p>
               {videos.length > 0 && (
                 <p className="filter-badge">✓ Shorts filtered out</p>
               )}
