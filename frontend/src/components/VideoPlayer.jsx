@@ -27,7 +27,7 @@ function VideoPlayer({ videoId, onClose }) {
             className="video-iframe"
             width="560"
             height="315"
-            src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+            src={`https://piped.video/embed/${videoId}`}
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
