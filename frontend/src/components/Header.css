@@ -19,73 +19,36 @@
 
 .brand-block {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
-}
-
-.brand-text {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
   min-width: 0;
 }
 
 .app-title {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.45rem;
   line-height: 1.1;
-  letter-spacing: 0.01em;
-  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.app-title-logo {
+  font-weight: 800;
+  background: linear-gradient(90deg, #ff7b7b 0%, #ffd27a 50%, #ff7b7b 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: logoShimmer 6s linear infinite, logoPulse 2.8s ease-in-out infinite;
 }
 
 .app-subtitle {
-  margin: 0.2rem 0 0;
+  margin: 0;
   color: var(--muted);
   font-size: 0.82rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.brand-logo {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-}
-
-.logo-orbit-base {
-  fill: none;
-  stroke: #273449;
-  stroke-width: 6;
-}
-
-.logo-orbit-accent {
-  fill: none;
-  stroke: url(#lapopLogoGradient);
-  stroke-width: 6;
-  stroke-linecap: round;
-  transform-origin: 48px 48px;
-  animation: orbitSweep 5s linear infinite;
-}
-
-.logo-play-core {
-  fill: url(#lapopLogoGradient);
-  transform-origin: 48px 48px;
-  animation: corePulse 2.4s ease-in-out infinite;
-}
-
-.logo-dot {
-  fill: #ff8d4d;
-  animation: dotPulse 1.8s ease-in-out infinite;
-}
-
-.logo-wave {
-  fill: none;
-  stroke: #8ea0b9;
-  stroke-width: 3;
-  stroke-linecap: round;
-  opacity: 0.75;
-  stroke-dasharray: 55;
-  stroke-dashoffset: 55;
-  animation: waveTrace 3.2s ease-in-out infinite;
 }
 
 .header-right {
@@ -164,61 +127,27 @@
   color: #ff9d9d;
 }
 
-@keyframes orbitSweep {
+@keyframes logoShimmer {
   from {
-    transform: rotate(0deg);
+    background-position: 0% 50%;
   }
   to {
-    transform: rotate(360deg);
+    background-position: 200% 50%;
   }
 }
 
-@keyframes corePulse {
+@keyframes logoPulse {
   0%,
   100% {
-    transform: scale(1);
-    opacity: 0.95;
+    opacity: 0.88;
   }
   50% {
-    transform: scale(1.05);
     opacity: 1;
-  }
-}
-
-@keyframes dotPulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.85;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
-}
-
-@keyframes waveTrace {
-  0%,
-  18% {
-    stroke-dashoffset: 55;
-    opacity: 0;
-  }
-  40%,
-  80% {
-    stroke-dashoffset: 0;
-    opacity: 0.8;
-  }
-  100% {
-    stroke-dashoffset: -55;
-    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .logo-orbit-accent,
-  .logo-play-core,
-  .logo-dot,
-  .logo-wave {
+  .app-title-logo {
     animation: none;
   }
 }
