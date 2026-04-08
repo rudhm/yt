@@ -55,14 +55,14 @@
 }
 
 .app-title-logo::before {
-  color: #58e6ff;
+  color: #ff3f6c;
   clip-path: inset(8% 0 48% 0);
   transform: translateX(-2px);
   animation: logoGlitchTop 5s steps(1, end) infinite;
 }
 
 .app-title-logo::after {
-  color: #ff74cc;
+  color: #ff9ac4;
   clip-path: inset(45% 0 5% 0);
   transform: translateX(2px);
   animation: logoGlitchBottom 5.4s steps(1, end) infinite;
@@ -72,12 +72,12 @@
   --float-distance: 3px;
   display: inline-block;
   color: transparent;
-  background: linear-gradient(120deg, #ff5a8a 0%, #ffc85e 30%, #7ce8ff 58%, #8f7bff 78%, #ff77cf 100%);
+  background: linear-gradient(120deg, #ff2f54 0%, #ff456e 26%, #ff5f88 52%, #ff79a8 76%, #ff95c5 100%);
   background-size: 220% 220%;
   -webkit-background-clip: text;
   background-clip: text;
   transform-origin: 50% 85%;
-  filter: drop-shadow(0 0 0.5rem rgba(255, 106, 171, 0.28));
+  filter: drop-shadow(0 0 0.5rem rgba(255, 92, 150, 0.32));
   animation:
     logoGradient 6s linear infinite,
     logoWave 2.4s ease-in-out infinite,
