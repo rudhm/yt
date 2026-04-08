@@ -31,7 +31,15 @@ Backend API server for the custom YouTube frontend. Filters out YouTube Shorts a
    JWT_SECRET=your_secure_random_secret
    SESSION_SECRET=another_secure_random_secret
    FRONTEND_URL=http://localhost:5173
+   # Optional additional origins:
+   # FRONTEND_URLS=https://your-app.vercel.app,https://www.yourdomain.com
+   NODE_ENV=development
    ```
+
+   For cross-origin auth in production (e.g. Vercel frontend + Render backend), set:
+   - `NODE_ENV=production`
+   - `FRONTEND_URL` to your exact frontend origin
+   - `FRONTEND_URLS` if you need multiple allowed frontend origins
 
 3. **Get a YouTube API Key:**
    - Go to [Google Cloud Console](https://console.cloud.google.com)

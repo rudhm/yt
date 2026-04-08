@@ -7,16 +7,25 @@ const passport = require('passport');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const BIND_HOST = process.env.BIND_HOST || '0.0.0.0';
+const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
 
 // Trust proxy for Render deployment (fixes OAuth HTTPS redirect_uri)
 app.set('trust proxy', 1);
 
 // Middleware
-const allowedOrigins = [
+const configuredOrigins = [
   process.env.FRONTEND_URL,
+  ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []),
+]
+  .map((origin) => origin && origin.trim())
+  .filter(Boolean)
+  .map((origin) => origin.replace(/\/$/, ''));
+
+const allowedOrigins = Array.from(new Set([
+  ...configuredOrigins,
   'http://localhost:5173',
   'https://yt-flame-five.vercel.app'
-].filter(Boolean).map(o => o.replace(/\/$/, ''));
+]));
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -32,6 +41,8 @@ app.use(cors({
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200
 }));
 app.use(express.json());
@@ -41,8 +52,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-secret-change-in-production',
   resave: false,
   saveUninitialized: false,
+  proxy: isProduction,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
