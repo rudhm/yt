@@ -4,6 +4,7 @@ const axios = require('axios');
 const NodeCache = require('node-cache');
 const { authenticateToken } = require('../middleware/auth');
 const { getUserOAuthToken } = require('./auth');
+const { parseDuration } = require('../utils/youtube');
 
 // In-memory cache: 15 minutes TTL (900 seconds)
 const feedCache = new NodeCache({ stdTTL: 900, checkperiod: 120 });
@@ -250,17 +251,5 @@ router.get('/feed', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch subscription feed' });
   }
 });
-
-// Helper function to parse ISO 8601 duration to seconds
-function parseDuration(duration) {
-  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!match) return 0;
-  
-  const hours = parseInt(match[1] || 0);
-  const minutes = parseInt(match[2] || 0);
-  const seconds = parseInt(match[3] || 0);
-  
-  return hours * 3600 + minutes * 60 + seconds;
-}
 
 module.exports = router;

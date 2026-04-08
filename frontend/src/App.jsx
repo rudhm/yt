@@ -1,4 +1,4 @@
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/AuthProvider';
 import Header from './components/Header';
 import Home from './pages/Home';
 import './App.css';

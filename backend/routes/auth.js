@@ -35,7 +35,7 @@ passport.use(new GoogleStrategy({
     userTokens.set(profile.id, {
       accessToken,
       refreshToken,
-      expiresAt: Date.now() + (365 * 24 * 3600 * 1000) // 365 days
+      expiresAt: Date.now() + (3540 * 1000) // 59 minutes (conservative)
     });
 
     return done(null, user);
@@ -61,7 +61,7 @@ router.get('/google', passport.authenticate('google', {
 router.get('/google/callback',
   passport.authenticate('google', { 
     session: false,
-    failureRedirect: process.env.FRONTEND_URL + '/?error=auth_failed'
+    failureRedirect: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/?error=auth_failed'
   }),
   (req, res) => {
     try {
@@ -107,5 +107,7 @@ const getUserOAuthToken = (userId) => {
   return tokens.accessToken;
 };
 
-module.exports = router;
-module.exports.getUserOAuthToken = getUserOAuthToken;
+module.exports = {
+  router,
+  getUserOAuthToken
+};

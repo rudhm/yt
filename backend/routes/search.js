@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const { parseDuration } = require('../utils/youtube');
 
 router.get('/', async (req, res) => {
   try {
@@ -19,55 +20,76 @@ router.get('/', async (req, res) => {
       });
     }
 
-    // Using videoDuration=medium to filter out most Shorts
-    // Medium: 4-20 minutes, Long: >20 minutes
-    // This excludes anything under 4 minutes which covers essentially all Shorts
+    // We fetch more results than requested because we will filter out Shorts
+    // search.list doesn't provide duration, so we fetch details afterwards
     const params = {
       part: 'snippet',
       q: q,
       type: 'video',
-      videoDuration: 'medium', // Filters out Shorts (<4 min)
-      maxResults: parseInt(maxResults),
+      maxResults: Math.min(50, parseInt(maxResults) * 2), // Fetch more to allow filtering
       key: API_KEY,
-      fields: 'items(id(videoId),snippet(title,thumbnails,publishedAt,channelTitle)),pageInfo,nextPageToken,prevPageToken'
+      fields: 'items(id(videoId),snippet(title,thumbnails,publishedAt,channelTitle)),nextPageToken'
     };
 
-    // Add pageToken if provided for pagination
     if (pageToken) {
       params.pageToken = pageToken;
     }
 
-    const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+    const searchResponse = await axios.get('https://www.googleapis.com/youtube/v3/search', {
       params
     });
 
-    console.log(`✓ Search successful: "${q}" - ${response.data.items?.length || 0} results ${pageToken ? '(page ' + pageToken + ')' : ''}`);
+    const searchItems = searchResponse.data.items || [];
+    if (searchItems.length === 0) {
+      return res.json({
+        query: q,
+        items: [],
+        nextPageToken: searchResponse.data.nextPageToken
+      });
+    }
+
+    // Get durations for filtering
+    const videoIds = searchItems.map(item => item.id.videoId);
+    const videosResponse = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+      params: {
+        part: 'contentDetails',
+        id: videoIds.join(','),
+        key: API_KEY,
+        fields: 'items(id,contentDetails(duration))'
+      }
+    });
+
+    const durationsMap = {};
+    videosResponse.data.items.forEach(v => {
+      durationsMap[v.id] = parseDuration(v.contentDetails.duration);
+    });
+
+    // Filter results: No Shorts (>= 240 seconds / 4 minutes)
+    const filteredItems = searchItems
+      .filter(item => {
+        const duration = durationsMap[item.id.videoId];
+        return duration >= 240; // 4 minutes
+      })
+      .slice(0, parseInt(maxResults));
+
+    console.log(`✓ Search successful: "${q}" - Found ${filteredItems.length} videos (after filtering ${searchItems.length - filteredItems.length} shorts)`);
 
     res.json({
       query: q,
-      totalResults: response.data.pageInfo?.totalResults || 0,
-      resultsReturned: response.data.items?.length || 0,
-      items: response.data.items || [],
-      pageInfo: response.data.pageInfo,
-      nextPageToken: response.data.nextPageToken,
-      prevPageToken: response.data.prevPageToken
+      items: filteredItems,
+      nextPageToken: searchResponse.data.nextPageToken,
+      filtered: `Shorts removed (duration < 4 minutes).`
     });
 
   } catch (error) {
     console.error('Error fetching from YouTube API:', error.message);
     
     if (error.response) {
-      // YouTube API error
       const status = error.response.status;
       const message = error.response.data?.error?.message || 'YouTube API error';
-      
-      return res.status(status).json({ 
-        error: message,
-        code: error.response.data?.error?.code
-      });
+      return res.status(status).json({ error: message });
     }
     
-    // Network or other error
     res.status(500).json({ error: 'Failed to fetch videos' });
   }
 });

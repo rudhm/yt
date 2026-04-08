@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import SearchBar from '../components/SearchBar';
 import VideoGrid from '../components/VideoGrid';
 import VideoPlayer from '../components/VideoPlayer';

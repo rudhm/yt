@@ -41,7 +41,7 @@ const subscriptionsRoutes = require('./routes/subscriptions');
 
 // Use Routes
 app.use('/api/search', searchRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes.router);
 app.use('/api/subscriptions', subscriptionsRoutes);
 // app.use('/api/video', videoRoutes);
 
