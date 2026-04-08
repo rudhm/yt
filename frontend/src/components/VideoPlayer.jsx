@@ -1,9 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import './VideoPlayer.css';
 
 function VideoPlayer({ videoId, onClose }) {
-  const playerRef = useRef(null);
-
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
@@ -16,7 +14,7 @@ function VideoPlayer({ videoId, onClose }) {
   }, [onClose]);
 
   if (!videoId) return null;
-  const pipedInstance = (import.meta.env.VITE_PIPED_INSTANCE || 'https://piped.mha.fi').replace(/\/$/, '');
+  const youtubeEmbedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1`;
 
   return (
     <div className="video-player-overlay" onClick={onClose}>
@@ -24,11 +22,10 @@ function VideoPlayer({ videoId, onClose }) {
         <button className="close-button" onClick={onClose}>×</button>
         <div className="player-wrapper">
           <iframe
-            ref={playerRef}
             className="video-iframe"
             width="560"
             height="315"
-            src={`${pipedInstance}/embed/${videoId}`}
+            src={youtubeEmbedUrl}
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

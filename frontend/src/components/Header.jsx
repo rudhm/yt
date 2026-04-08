@@ -3,12 +3,24 @@ import './Header.css';
 
 function Header() {
   const { user, isAuthenticated, login, logout, loading } = useAuth();
+  const brandName = 'lapop';
 
   return (
     <header className="app-header">
       <div className="header-content">
         <div className="brand-block">
-          <h1 className="app-title app-title-logo">lapop</h1>
+          <h1 className="app-title app-title-logo" data-text={brandName} aria-label={brandName}>
+            {brandName.split('').map((character, index) => (
+              <span
+                key={`${character}-${index}`}
+                className="logo-letter"
+                style={{ '--letter-index': index }}
+                aria-hidden="true"
+              >
+                {character}
+              </span>
+            ))}
+          </h1>
           <p className="app-subtitle">Search-focused YouTube. Shorts filtered.</p>
         </div>
 
