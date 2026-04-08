@@ -61,7 +61,7 @@ router.get('/google', passport.authenticate('google', {
 router.get('/google/callback',
   passport.authenticate('google', { 
     session: false,
-    failureRedirect: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/?error=auth_failed'
+    failureRedirect: (process.env.FRONTEND_URL || 'https://yt-flame-five.vercel.app') + '/?error=auth_failed'
   }),
   (req, res) => {
     try {
@@ -69,10 +69,11 @@ router.get('/google/callback',
       const token = generateToken(req.user);
 
       // Redirect to frontend with token
-      const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const frontendURL = process.env.FRONTEND_URL || 'https://yt-flame-five.vercel.app';
       res.redirect(`${frontendURL}/?token=${token}`);
     } catch (error) {
       console.error('OAuth callback error:', error);
+      const frontendURL = process.env.FRONTEND_URL || 'https://yt-flame-five.vercel.app';
       res.redirect(`${frontendURL}/?error=token_generation_failed`);
     }
   }

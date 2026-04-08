@@ -300,7 +300,8 @@ The app requests these permissions:
 
 **"redirect_uri_mismatch"**
 - Check Google Console redirect URI matches exactly
-- Should be: `http://localhost:5000/api/auth/google/callback`
+- For development: `http://localhost:5000/api/auth/google/callback`
+- For production: `https://yt-lapop.onrender.com/api/auth/google/callback`
 
 **"OAuth token expired"**
 - User needs to sign in again
