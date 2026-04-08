@@ -6,6 +6,7 @@ const passport = require('passport');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const BIND_HOST = process.env.BIND_HOST || '0.0.0.0';
 
 // Trust proxy for Render deployment (fixes OAuth HTTPS redirect_uri)
 app.set('trust proxy', 1);
@@ -88,11 +89,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  const host = process.env.NODE_ENV === 'production' ? 'https://yt-lapop.onrender.com' : `http://localhost:${PORT}`;
-  console.log(`✓ Server is running on port ${PORT}`);
-  console.log(`✓ Health check: ${host}/`);
-  console.log(`✓ Search API: ${host}/api/search`);
-  console.log(`✓ Auth API: ${host}/api/auth/google`);
-  console.log(`✓ Subscriptions API: ${host}/api/subscriptions`);
+app.listen(PORT, BIND_HOST, () => {
+  const publicHost = process.env.NODE_ENV === 'production' ? 'https://yt-lapop.onrender.com' : `http://localhost:${PORT}`;
+  console.log(`✓ Server is running on ${BIND_HOST}:${PORT}`);
+  console.log(`✓ Health check: ${publicHost}/`);
+  console.log(`✓ Search API: ${publicHost}/api/search`);
+  console.log(`✓ Auth API: ${publicHost}/api/auth/google`);
+  console.log(`✓ Subscriptions API: ${publicHost}/api/subscriptions`);
 });
