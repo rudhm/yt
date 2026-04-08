@@ -42,3 +42,9 @@ coverage/
 *.temp
 .cache/
 DEPLOYMENT_GUIDE.md
+
+# Development notes and phase documentation (keep local only)
+BACKEND_PHASE3_COMPLETE.md
+FRONTEND_PHASE3_COMPLETE.md
+PHASE3_COMPLETE.md
+youtube_frontend_project_note.md
