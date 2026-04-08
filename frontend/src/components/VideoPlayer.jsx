@@ -25,10 +25,12 @@ function VideoPlayer({ videoId, onClose }) {
           <iframe
             ref={playerRef}
             className="video-iframe"
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0`}
+            width="560"
+            height="315"
+            src={`https://www.youtube-nocookie.com/embed/${videoId}`}
             title="YouTube video player"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
           <div className="video-shield" />
