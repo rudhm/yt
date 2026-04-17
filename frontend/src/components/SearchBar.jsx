@@ -18,6 +18,8 @@ function SearchBar({ onSearch, isLoading }) {
           type="text"
           className="search-input"
           placeholder="Search videos (no Shorts)..."
+          aria-label="Search videos"
+          autoComplete="off"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           disabled={isLoading}

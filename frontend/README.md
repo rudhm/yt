@@ -14,3 +14,14 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## UI resource guardrails
+
+UI improvements in this project should stay resource-neutral:
+
+- Keep bundle output effectively flat (no meaningful size increase)
+- Avoid introducing new runtime dependencies for visual styling
+- Do not add extra API calls or polling for UI effects
+- Prefer CSS-only polish (spacing, typography, contrast, focus states)
+- Avoid new continuous animations; prefer static styles or interaction-only transitions
+- Preserve `prefers-reduced-motion` behavior for motion-sensitive users

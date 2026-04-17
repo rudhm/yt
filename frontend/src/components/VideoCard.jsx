@@ -1,15 +1,18 @@
+import { memo } from 'react';
 import './VideoCard.css';
+
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric'
+});
 
 function VideoCard({ video, onClick }) {
   const { snippet, id } = video;
   const videoId = id.videoId || id;
   const thumbnailUrl = snippet.thumbnails?.medium?.url || snippet.thumbnails?.default?.url;
   const publishedDate = snippet.publishedAt
-    ? new Date(snippet.publishedAt).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      })
+    ? dateFormatter.format(new Date(snippet.publishedAt))
     : null;
 
   return (
@@ -34,4 +37,4 @@ function VideoCard({ video, onClick }) {
   );
 }
 
-export default VideoCard;
+export default memo(VideoCard);

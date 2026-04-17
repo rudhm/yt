@@ -112,6 +112,7 @@ function Home() {
             videos={videos}
             onVideoClick={handleVideoClick}
             isLoading={isLoading}
+            hasSearched={Boolean(searchQuery)}
           />
           
           {!isLoading && videos.length > 0 && nextPageToken && (
