@@ -13,7 +13,7 @@ const feedCache = new NodeCache({ stdTTL: 900, checkperiod: 120 });
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    const oauthToken = getUserOAuthToken(userId);
+    const oauthToken = await getUserOAuthToken(req, res);
 
     if (!oauthToken) {
       return res.status(401).json({ 
@@ -70,7 +70,7 @@ router.get('/feed', authenticateToken, async (req, res) => {
   try {
     const { maxResults = 20, pageToken } = req.query;
     const userId = req.user.id;
-    const oauthToken = getUserOAuthToken(userId);
+    const oauthToken = await getUserOAuthToken(req, res);
 
     if (!oauthToken) {
       return res.status(401).json({ 

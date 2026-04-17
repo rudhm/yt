@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const passport = require('passport');
 
 const app = express();
@@ -46,6 +47,7 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Session configuration (needed for OAuth flow)
 app.use(session({

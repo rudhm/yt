@@ -29,6 +29,7 @@ Backend API server for the custom YouTube frontend. Filters out YouTube Shorts a
    GOOGLE_CLIENT_ID=your_google_client_id
    GOOGLE_CLIENT_SECRET=your_google_client_secret
    JWT_SECRET=your_secure_random_secret
+   OAUTH_COOKIE_ENCRYPTION_KEY=your_cookie_encryption_secret
    SESSION_SECRET=another_secure_random_secret
    FRONTEND_URL=http://localhost:5173
    # Optional additional origins:
@@ -40,6 +41,7 @@ Backend API server for the custom YouTube frontend. Filters out YouTube Shorts a
    - `NODE_ENV=production`
    - `FRONTEND_URL` to your exact frontend origin
    - `FRONTEND_URLS` if you need multiple allowed frontend origins
+   - Keep `JWT_SECRET` and `OAUTH_COOKIE_ENCRYPTION_KEY` stable across redeploys to preserve sign-in sessions
 
 3. **Get a YouTube API Key:**
    - Go to [Google Cloud Console](https://console.cloud.google.com)
@@ -90,7 +92,7 @@ Returns authenticated user's information.
 POST /api/auth/logout
 Authorization: Bearer JWT_TOKEN
 ```
-Clears OAuth tokens.
+Clears persisted OAuth cookie state and active OAuth tokens.
 
 ### Search
 
@@ -156,7 +158,9 @@ backend/
 ├── middleware/
 │   └── auth.js            # JWT authentication middleware
 ├── utils/
-│   └── jwt.js             # JWT token utilities
+│   ├── jwt.js             # JWT token utilities
+│   ├── googleOAuth.js     # Google token refresh helper
+│   └── oauthCookies.js    # Encrypted HttpOnly OAuth cookie helpers
 ├── .env                   # Environment variables (not committed)
 ├── .gitignore             # Git ignore rules
 ├── package.json           # Dependencies and scripts
@@ -174,6 +178,7 @@ backend/
 - **passport-google-oauth20**: Google OAuth 2.0 strategy
 - **jsonwebtoken**: JWT token generation and verification
 - **express-session**: Session management for OAuth flow
+- **cookie-parser**: Cookie parsing for persistent OAuth state
 - **nodemon**: Auto-restart during development (dev only)
 
 ## Next Steps

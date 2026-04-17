@@ -20,8 +20,9 @@ window.location.href = 'http://localhost:5000/api/auth/google';
 2. Redirects to Google OAuth consent screen
 3. User approves permissions
 4. Google redirects back to `/api/auth/google/callback`
-5. Backend generates JWT token
-6. Redirects to frontend with token: `http://localhost:5173/?token=JWT_TOKEN`
+5. Backend stores encrypted OAuth state in an HttpOnly cookie
+6. Backend generates JWT token
+7. Redirects to frontend with token: `http://localhost:5173/?token=JWT_TOKEN`
 
 ---
 
@@ -71,7 +72,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 POST /api/auth/logout
 ```
 
-**Description:** Clears server-side OAuth tokens.
+**Description:** Clears persisted OAuth cookie state and active OAuth tokens.
 
 **Headers:**
 ```
@@ -189,8 +190,8 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 ### Token Lifetime
-- Expires in 7 days
-- Frontend should handle token refresh/re-login
+- Expires in 365 days
+- Frontend should retain token in localStorage for long-lived sessions
 
 ### Using Tokens in Frontend
 ```javascript
@@ -215,6 +216,7 @@ GOOGLE_CLIENT_ID=your_client_id
 GOOGLE_CLIENT_SECRET=your_client_secret
 JWT_SECRET=random_secure_secret
 SESSION_SECRET=another_secure_secret
+OAUTH_COOKIE_ENCRYPTION_KEY=secure_cookie_encryption_secret
 FRONTEND_URL=http://localhost:5173
 YOUTUBE_API_KEY=your_youtube_api_key
 ```
@@ -240,9 +242,10 @@ The app requests these permissions:
    - Contains only necessary user info
 
 2. **OAuth Tokens:**
-   - Stored server-side only
-   - Never exposed to frontend
+   - Stored as encrypted `HttpOnly` backend cookie state
+   - Never exposed to frontend JavaScript
    - Used only for YouTube API calls
+   - Access token is automatically refreshed from refresh token when possible
 
 3. **CORS:**
    - Restricted to frontend URL
@@ -304,8 +307,8 @@ The app requests these permissions:
 - For production: `https://yt-lapop.onrender.com/api/auth/google/callback`
 
 **"OAuth token expired"**
-- User needs to sign in again
-- Frontend should detect and redirect to login
+- Backend will auto-refresh access token using persisted refresh token
+- Re-login is only required if refresh token is revoked/invalid
 
 **"invalid_grant"**
 - OAuth refresh token failed

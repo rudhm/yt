@@ -83,6 +83,7 @@ YOUTUBE_API_KEY=AIzaSy...your_existing_key
 GOOGLE_CLIENT_ID=123456789-abcdef.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-abc123def456
 JWT_SECRET=my_super_secure_random_secret_key_change_this
+OAUTH_COOKIE_ENCRYPTION_KEY=third_random_secret_for_oauth_cookie_encryption
 SESSION_SECRET=another_random_secret_for_sessions_change_this
 FRONTEND_URL=http://localhost:5173
 
@@ -97,7 +98,8 @@ You can generate random secrets with this command:
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Run it twice to get two different secrets for JWT_SECRET and SESSION_SECRET.
+Run it three times to get different secrets for `JWT_SECRET`, `OAUTH_COOKIE_ENCRYPTION_KEY`, and `SESSION_SECRET`.
+Keep these values stable in production to avoid forced sign-outs after redeploy.
 
 ---
 
@@ -138,7 +140,7 @@ Before proceeding with implementation, verify:
 - ✅ Client ID and Secret copied
 - ✅ Backend `.env` updated with OAuth credentials
 - ✅ Frontend `.env` updated with Client ID
-- ✅ JWT_SECRET and SESSION_SECRET generated
+- ✅ JWT_SECRET, OAUTH_COOKIE_ENCRYPTION_KEY, and SESSION_SECRET generated
 - ✅ Dependencies installed
 
 ---
