@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import './VideoPlayer.css';
 
-function VideoPlayer({ videoId, videoTitle, onClose }) {
+function VideoPlayer({ video, onClose, onWatchLater, isInWatchLater }) {
   const [copied, setCopied] = useState(false);
 
   const handleEscape = useCallback((e) => {
@@ -18,7 +18,10 @@ function VideoPlayer({ videoId, videoTitle, onClose }) {
     };
   }, [handleEscape]);
 
-  if (!videoId) return null;
+  if (!video) return null;
+
+  const videoId = video.id?.videoId || video.id;
+  const videoTitle = video.snippet?.title;
 
   const youtubeEmbedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1`;
   const youtubeWatchUrl = `https://www.youtube.com/watch?v=${videoId}`;
@@ -78,18 +81,29 @@ function VideoPlayer({ videoId, videoTitle, onClose }) {
                 </>
               )}
             </button>
-            <a
-              className="player-action-btn"
-              href={youtubeWatchUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Open on YouTube"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
-                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 4-8 4z"/>
-              </svg>
-              YouTube
-            </a>
+            {onWatchLater && (
+              <button
+                className={`player-action-btn ${isInWatchLater?.(videoId) ? 'active' : ''}`}
+                onClick={() => onWatchLater(video)}
+                title={isInWatchLater?.(videoId) ? 'Remove from Watch Later' : 'Add to Watch Later'}
+              >
+                {isInWatchLater?.(videoId) ? (
+                  <>
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
+                      <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                    </svg>
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="15" height="15">
+                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Watch Later
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
 

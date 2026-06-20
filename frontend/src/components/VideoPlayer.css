@@ -107,6 +107,12 @@
   background: var(--success-bg);
 }
 
+.player-action-btn.active {
+  color: var(--accent);
+  border-color: rgba(255, 77, 106, 0.3);
+  background: rgba(255, 77, 106, 0.15);
+}
+
 /* ─── Close Button ─── */
 .close-button {
   display: flex;

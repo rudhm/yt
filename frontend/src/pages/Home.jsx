@@ -92,8 +92,8 @@ function Home() {
     }
   };
 
-  const handleVideoClick = (videoId, title) => {
-    setSelectedVideo({ id: videoId, title });
+  const handleVideoClick = (video) => {
+    setSelectedVideo(video);
   };
 
   const handleClosePlayer = () => {
@@ -224,9 +224,10 @@ function Home() {
 
       {selectedVideo && (
         <VideoPlayer 
-          videoId={selectedVideo.id}
-          videoTitle={selectedVideo.title}
+          video={selectedVideo}
           onClose={handleClosePlayer}
+          onWatchLater={handleWatchLaterToggle}
+          isInWatchLater={isInWatchLater}
         />
       )}
     </div>

@@ -25,7 +25,7 @@ function VideoCard({ video, onClick, onWatchLater, isInWatchLater }) {
   const inWatchLater = isInWatchLater?.(videoId);
 
   return (
-    <button type="button" className="video-card" onClick={() => onClick(videoId, snippet.title)}>
+    <button type="button" className="video-card" onClick={() => onClick(video)}>
       <div className="thumbnail-container">
         <img 
           src={thumbnailUrl} 
