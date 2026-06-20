@@ -1,6 +1,19 @@
 import VideoCard from './VideoCard';
 import './VideoGrid.css';
 
+function SkeletonCard() {
+  return (
+    <div className="skeleton-card">
+      <div className="skeleton-thumbnail" />
+      <div className="skeleton-info">
+        <div className="skeleton-line" />
+        <div className="skeleton-line" />
+        <div className="skeleton-line" />
+      </div>
+    </div>
+  );
+}
+
 function VideoGrid({
   videos,
   onVideoClick,
@@ -10,9 +23,10 @@ function VideoGrid({
 }) {
   if (isLoading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading videos...</p>
+      <div className="skeleton-grid">
+        {Array.from({ length: 8 }, (_, i) => (
+          <SkeletonCard key={i} />
+        ))}
       </div>
     );
   }
@@ -21,8 +35,9 @@ function VideoGrid({
     if (!hasSearched) {
       return (
         <div className="empty-state empty-state-start">
+          <span className="empty-state-icon">🎬</span>
           <p className="empty-state-title">Search for videos without Shorts</p>
-          <p className="empty-state-subtitle">Try a topic, channel, or creator to get started.</p>
+          <p className="empty-state-subtitle">Try a topic, channel, or creator name to get started.</p>
         </div>
       );
     }

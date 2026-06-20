@@ -24,6 +24,11 @@ function VideoCard({ video, onClick }) {
           className="thumbnail"
           loading="lazy"
         />
+        <div className="play-overlay" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
       </div>
       <div className="video-info">
         <h3 className="video-title">{snippet.title}</h3>

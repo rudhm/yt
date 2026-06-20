@@ -1,3 +1,4 @@
+/* ─── Video Card ─── */
 .video-card {
   width: 100%;
   height: 100%;
@@ -6,73 +7,150 @@
   padding: 0;
   text-align: left;
   background: var(--surface);
-  border: 1px solid var(--line-color);
-  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.2s, transform 0.2s, background-color 0.2s;
+  position: relative;
+  isolation: isolate;
+  transition:
+    border-color var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-spring),
+    box-shadow var(--duration-normal) var(--ease-out);
 }
 
 .video-card:hover {
-  transform: translateY(-1px);
-  border-color: #3f5474;
-  background: #171f2d;
+  transform: translateY(-4px) scale(1.01);
+  border-color: var(--line-hover);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(80, 115, 165, 0.1);
+}
+
+.video-card:active {
+  transform: translateY(-1px) scale(0.995);
 }
 
 .video-card:focus-visible {
-  outline: 2px solid #5f81b8;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
+/* ─── Thumbnail ─── */
 .thumbnail-container {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #000;
+  background: #0a0e14;
+  overflow: hidden;
 }
 
 .thumbnail {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform var(--duration-slow) var(--ease-out);
 }
 
+.video-card:hover .thumbnail {
+  transform: scale(1.05);
+}
+
+/* Subtle gradient overlay on thumbnail */
+.thumbnail-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(9, 13, 19, 0.5) 0%,
+    transparent 40%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-normal);
+}
+
+.video-card:hover .thumbnail-container::after {
+  opacity: 1;
+}
+
+/* Play icon overlay */
+.play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: rgba(255, 77, 106, 0.92);
+  border-radius: var(--radius-full);
+  z-index: 2;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition:
+    opacity var(--duration-normal),
+    transform var(--duration-normal) var(--ease-spring);
+}
+
+.play-overlay svg {
+  margin-left: 2px; /* Optical centering for play triangle */
+}
+
+.video-card:hover .play-overlay {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* ─── Video Info ─── */
 .video-info {
-  padding: 0.9rem;
+  padding: 0.85rem 1rem;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .video-title {
-  font-size: 0.97rem;
-  font-weight: 600;
-  margin: 0 0 0.4rem 0;
-  color: var(--text);
-  line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.video-meta {
-  font-size: 0.8rem;
-  color: var(--muted);
-  margin: 0 0 0.45rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.video-description {
-  font-size: 0.83rem;
-  color: #9ba6b6;
+  font-size: 0.93rem;
+  font-weight: 650;
   margin: 0;
+  color: var(--text);
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  transition: color var(--duration-fast);
+}
+
+.video-card:hover .video-title {
+  color: #fff;
+}
+
+.video-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  font-weight: 500;
+}
+
+.video-description {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0.7;
 }

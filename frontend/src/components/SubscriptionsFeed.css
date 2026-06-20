@@ -1,86 +1,115 @@
+/* ─── Subscriptions Feed ─── */
 .subscriptions-feed {
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 1.4rem 0 0;
+  padding: 1.5rem 0 0;
+  animation: fadeInUp var(--duration-slow) var(--ease-out);
 }
 
 .feed-header {
-  padding: 0 1rem 1rem;
+  padding: 0 1.25rem 1.25rem;
 }
 
 .feed-header h2 {
-  margin: 0 0 0.35rem 0;
-  font-size: 1.45rem;
+  margin: 0 0 0.3rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.02em;
 }
 
 .feed-subtitle {
   margin: 0 0 0.75rem 0;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 500;
 }
 
 .feed-stats {
-  margin-top: 0.75rem;
+  margin-top: 0.6rem;
 }
 
+/* ─── Shared Badges & Buttons ─── */
 .subscriptions-feed .filter-badge {
   display: inline-flex;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid #2f6048;
-  background: rgba(65, 158, 108, 0.15);
-  color: #90e3bc;
-  font-size: 0.8rem;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--success-border);
+  background: var(--success-bg);
+  color: var(--success);
+  font-size: 0.78rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .subscriptions-feed .error-message {
-  max-width: 980px;
-  margin: 0 auto 1.2rem;
-  padding: 0.9rem 1rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 93, 93, 0.42);
-  background: rgba(255, 93, 93, 0.12);
-  color: #ff9f9f;
+  max-width: 620px;
+  margin: 0 auto 1.5rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--error-border);
+  background: var(--error-bg);
+  color: var(--error);
   text-align: center;
+  font-size: 0.92rem;
+  font-weight: 500;
+  animation: fadeInUp var(--duration-normal) var(--ease-out);
 }
 
 .subscriptions-feed .load-more-container {
   display: flex;
   justify-content: center;
-  padding: 2.2rem 0 1rem;
+  padding: 2.5rem 0 1rem;
 }
 
 .subscriptions-feed .load-more-button {
-  padding: 0.75rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 0.8rem 2rem;
+  font-size: 0.92rem;
+  font-weight: 700;
   color: var(--text);
-  background: var(--surface-elevated);
-  border: 1px solid #445b7c;
-  border-radius: 10px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  letter-spacing: 0.02em;
+  transition:
+    background var(--duration-fast),
+    border-color var(--duration-fast),
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-fast);
 }
 
 .subscriptions-feed .load-more-button:hover:not(:disabled) {
-  background: #1f2b3e;
-  border-color: #56739f;
+  background: var(--surface-hover);
+  border-color: var(--line-hover);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.subscriptions-feed .load-more-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
 }
 
 .subscriptions-feed .load-more-button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-@media (max-width: 768px) {
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  .feed-header {
+    padding: 0 1rem 1rem;
+  }
+
   .feed-header h2 {
-    font-size: 1.25rem;
+    font-size: 1.3rem;
   }
 
   .feed-subtitle {
-    font-size: 0.86rem;
+    font-size: 0.82rem;
   }
 }
