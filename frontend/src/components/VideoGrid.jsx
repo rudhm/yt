@@ -19,7 +19,9 @@ function VideoGrid({
   onVideoClick,
   isLoading,
   hasSearched = true,
-  emptyMessage = 'No videos found. Try a different search.'
+  emptyMessage = 'No videos found. Try a different search.',
+  onWatchLater,
+  isInWatchLater
 }) {
   if (isLoading) {
     return (
@@ -56,6 +58,8 @@ function VideoGrid({
           key={video.id.videoId || video.id} 
           video={video}
           onClick={onVideoClick}
+          onWatchLater={onWatchLater}
+          isInWatchLater={isInWatchLater}
         />
       ))}
     </div>
